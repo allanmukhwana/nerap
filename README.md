@@ -16,8 +16,8 @@ NERAP Cloud functions through a multi-layered system designed to collect, verify
 
 The platform aggregates data from a wide network of trusted partners across the healthcare and humanitarian sectors. This includes:
 *   **Direct Reporting from Health Facilities:** Public, private, and faith-based hospitals and clinics can directly update their inventory levels for critical items. This provides real-time, on-the-ground data on stock availability.
-*   **Integration with National Systems:** Through Application Programming Interfaces (APIs), NERAP Cloud is designed to integrate with existing national health databases, such as those managed by the Kenya Medical Supplies Authority (KEMSA), to reflect centralized supply chain information.[1, 2]
-*   **Humanitarian Partner Feeds:** During large-scale disasters, the platform can pull and display data from humanitarian organizations like the Kenya Red Cross and the World Food Programme, showing the locations of emergency shelters, food distribution points, and mobile clinics.[3, 4]
+*   **Integration with National Systems:** Through Application Programming Interfaces (APIs), NERAP Cloud is designed to integrate with existing national health databases, such as those managed by the Kenya Medical Supplies Authority (KEMSA), to reflect centralized supply chain information.
+*   **Humanitarian Partner Feeds:** During large-scale disasters, the platform can pull and display data from humanitarian organizations like the Kenya Red Cross and the World Food Programme, showing the locations of emergency shelters, food distribution points, and mobile clinics.
 
 **2. The Moderation Layer: Ensuring Verified and Actionable Information**
 
@@ -31,7 +31,7 @@ To prevent the spread of misinformation, which can be deadly in a crisis, NERAP 
 
 The front-end of NERAP Cloud is a user-friendly, map-based interface accessible via **www.nerap.cloud** on any web browser.
 *   **For the Public:** A family member can quickly search for a specific need (e.g., "rabies vaccine") and see the nearest facilities with verified stock, along with contact details and directions.
-*   **For Clinicians:** A doctor in a rural clinic can locate the nearest referral hospital with a functional ventilator or a specific antidote, streamlining the patient transfer process and saving critical time.[5]
+*   **For Clinicians:** A doctor in a rural clinic can locate the nearest referral hospital with a functional ventilator or a specific antidote, streamlining the patient transfer process and saving critical time.
 *   **For Emergency Responders:** Ambulance services and disaster management teams can get a system-level overview of available resources, enabling them to direct patients and supplies with maximum efficiency.
 
 ### Core Modules: Addressing Kenya's Most Pressing Needs
@@ -39,13 +39,13 @@ The front-end of NERAP Cloud is a user-friendly, map-based interface accessible 
 NERAP Cloud will launch with a focus on the critical emergencies identified in Kenya, with the flexibility to add new modules as needs evolve.
 
 *   **Antivenom and Toxicology:** Mapping the availability of WHO-prequalified antivenoms and essential antidotes for pesticide and methanol poisoning.[6, 7]
-*   **Life-Sustaining Biologicals:** Providing real-time inventory of rare blood types (especially O-negative), plasma-derived products, and rabies Post-Exposure Prophylaxis (PEP) and Rabies Immunoglobulin (RIG).[8, 9, 10]
-*   **Critical Care Capacity:** Tracking the number of *functional* ICU and HDU beds, ventilators, infant incubators, and medical oxygen plants.[5, 11, 12] This module will also track innovative solutions like mobile dialysis units to improve access in rural areas.[13, 14]
-*   **Humanitarian and Disaster Response:** In times of national crisis like floods or droughts, this module will serve as a central hub for locating official emergency shelters, food and water distribution points, and family tracing services provided by partners.[15, 16, 17]
+*   **Life-Sustaining Biologicals:** Providing real-time inventory of rare blood types (especially O-negative), plasma-derived products, and rabies Post-Exposure Prophylaxis (PEP) and Rabies Immunoglobulin (RIG).
+*   **Critical Care Capacity:** Tracking the number of *functional* ICU and HDU beds, ventilators, infant incubators, and medical oxygen plants.[5, 11, 12] This module will also track innovative solutions like mobile dialysis units to improve access in rural areas.
+*   **Humanitarian and Disaster Response:** In times of national crisis like floods or droughts, this module will serve as a central hub for locating official emergency shelters, food and water distribution points, and family tracing services provided by partners.
 
 ### Open Source: A Platform for Global Collaboration
 
-NERAP Cloud is being developed as a fully open-source platform. This decision is strategic and philosophical, inspired by the success of Kenyan-born crisis mapping tools like Ushahidi.[18]
+NERAP Cloud is being developed as a fully open-source platform. This decision is strategic and philosophical, inspired by the success of Kenyan-born crisis mapping tools like Ushahidi.
 
 *   **Transparency and Trust:** Open-source code allows anyone to inspect, audit, and verify the platform's security and functionality, fostering public trust.
 *   **Collaborative Innovation:** Developers, public health experts, and data scientists from around the world can contribute to the platform, suggesting improvements, adding new features, and strengthening its capabilities.
