@@ -1,3 +1,20 @@
+## Getting Started (Setup)
+
+This repo contains a working implementation of NERAP Cloud built with **Vanilla PHP, Bootstrap 5, jQuery, Font Awesome, MySQL, Brevo (API) and a WhatsApp Cloud API-compatible provider**. Flat, single-level file structure — files are grouped by prefix (`admin_*`, `auth_*`, `whatsapp_*`, `api_*`).
+
+1. **Database**: create a MySQL database (default name `nerap_cloud`) and import `db_schema.sql`.
+2. **Config**: copy `config.example.php` to `config.php` (already git-ignored) and fill in:
+   - `DB_HOST` / `DB_NAME` / `DB_USER` / `DB_PASS`
+   - `WA_ACCOUNT_UNIQUE`, `WA_API_SECRET`, `WA_WEBHOOK_SECRET`, `WA_NUMBER` (WhatsApp provider credentials)
+   - `BREVO_API_KEY`, `BREVO_SENDER_EMAIL` (Brevo transactional email, sent via REST API — no SMTP)
+   - `GOOGLE_MAPS_API_KEY`
+3. **First admin account**: visit `setup_admin.php` once in your browser to create the initial `super_admin` login, then delete that file.
+4. **WhatsApp webhook**: point your provider's webhook URL to `https://yourdomain.com/whatsapp_webhook.php`.
+5. **Alerts cron**: schedule `alert_cron.php` every 15 minutes (`*/15 * * * * php /path/to/alert_cron.php`) as a safety-net dispatcher alongside the instant alert sent on moderation approval.
+6. Log in at `auth_login.php` to manage facilities, resources, the moderation queue, subscribers, and broadcasts.
+
+---
+
 ## Inspiration
 
 The idea for NERAP Cloud was born from a devastating pattern — not a single tragedy, but a **thousand invisible ones**.

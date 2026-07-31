@@ -1,0 +1,231 @@
+/* =========================================================================
+   style.css — NERAP Cloud global stylesheet
+   Brand: Primary #042238 (deep navy), Secondary #1b693f (green), BG white.
+   Font: 'Plus Jakarta Sans' (clean, modern, highly legible on mobile).
+   Design goal: clean modern web dashboard that FEELS like a native mobile
+   app on phones (bottom tab bar, card-based lists, big touch targets,
+   safe-area padding, no default browser chrome feel).
+   ========================================================================= */
+
+:root {
+    --nerap-primary: #042238;
+    --nerap-secondary: #1b693f;
+    --nerap-bg: #ffffff;
+    --nerap-primary-soft: #0a3a5c;
+    --nerap-secondary-soft: #e8f5ee;
+    --nerap-danger: #c0392b;
+    --nerap-warning: #e0a800;
+    --nerap-grey: #6c757d;
+    --nerap-border: #e9edf1;
+    --nerap-radius: 16px;
+    --nerap-radius-sm: 10px;
+    --nerap-shadow: 0 4px 24px rgba(4, 34, 56, 0.08);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html, body {
+    background: var(--nerap-bg);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--nerap-primary);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+}
+
+a { text-decoration: none; }
+
+h1, h2, h3, h4, h5, .fw-brand { font-weight: 800; letter-spacing: -0.02em; }
+
+/* -------------------------------------------------------------------------
+   Buttons & badges — brand colors
+   ---------------------------------------------------------------------- */
+.btn-nerap-primary {
+    background: var(--nerap-primary);
+    border-color: var(--nerap-primary);
+    color: #fff;
+    border-radius: var(--nerap-radius-sm);
+    font-weight: 600;
+}
+.btn-nerap-primary:hover, .btn-nerap-primary:focus { background: var(--nerap-primary-soft); color: #fff; }
+
+.btn-nerap-secondary {
+    background: var(--nerap-secondary);
+    border-color: var(--nerap-secondary);
+    color: #fff;
+    border-radius: var(--nerap-radius-sm);
+    font-weight: 600;
+}
+.btn-nerap-secondary:hover, .btn-nerap-secondary:focus { background: #144f30; color: #fff; }
+
+.btn-outline-nerap {
+    border: 1.5px solid var(--nerap-primary);
+    color: var(--nerap-primary);
+    border-radius: var(--nerap-radius-sm);
+    font-weight: 600;
+    background: transparent;
+}
+.btn-outline-nerap:hover { background: var(--nerap-primary); color: #fff; }
+
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+}
+.badge-status.status-confirmed { background: var(--nerap-secondary); }
+.badge-status.status-low { background: var(--nerap-warning); color: #3a2c00; }
+.badge-status.status-out { background: var(--nerap-danger); }
+.badge-status.status-unverified { background: var(--nerap-grey); }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
+
+/* -------------------------------------------------------------------------
+   Top navbar (public) — sticky, translucent, native-app style
+   ---------------------------------------------------------------------- */
+.nerap-navbar {
+    background: var(--nerap-primary);
+    padding-top: calc(0.6rem + var(--safe-top));
+    padding-bottom: 0.6rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.nerap-navbar .navbar-brand img { height: 32px; }
+.nerap-navbar .navbar-brand span { color: #fff; font-weight: 800; margin-left: 8px; }
+.nerap-navbar .nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 600; }
+.nerap-navbar .nav-link.active, .nerap-navbar .nav-link:hover { color: #fff !important; }
+
+/* -------------------------------------------------------------------------
+   Cards, stat tiles, sections
+   ---------------------------------------------------------------------- */
+.nerap-card {
+    background: #fff;
+    border: 1px solid var(--nerap-border);
+    border-radius: var(--nerap-radius);
+    box-shadow: var(--nerap-shadow);
+}
+
+.stat-tile {
+    border-radius: var(--nerap-radius);
+    padding: 1.1rem 1.2rem;
+    background: #fff;
+    border: 1px solid var(--nerap-border);
+    box-shadow: var(--nerap-shadow);
+}
+.stat-tile .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--nerap-primary); }
+.stat-tile .stat-label { font-size: 0.8rem; color: var(--nerap-grey); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.stat-tile .stat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--nerap-secondary-soft); color: var(--nerap-secondary); font-size: 1.2rem;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--nerap-primary) 0%, #0a3a5c 100%);
+    color: #fff;
+    border-radius: 0 0 28px 28px;
+    padding: 2.2rem 0 2.6rem;
+}
+.hero-section .lead { color: rgba(255,255,255,0.85); }
+
+#nerap-map { width: 100%; height: 480px; border-radius: var(--nerap-radius); overflow: hidden; }
+@media (max-width: 767px) { #nerap-map { height: 340px; } }
+
+.facility-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.facility-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(4,34,56,0.12); }
+
+/* -------------------------------------------------------------------------
+   Bottom tab bar — makes the site feel like a native mobile app on phones
+   ---------------------------------------------------------------------- */
+.mobile-tabbar {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: #fff;
+    border-top: 1px solid var(--nerap-border);
+    padding: 6px 4px calc(6px + var(--safe-bottom));
+    z-index: 1040;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.06);
+}
+.mobile-tabbar .tab-item {
+    flex: 1;
+    text-align: center;
+    color: var(--nerap-grey);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 0;
+}
+.mobile-tabbar .tab-item i { display: block; font-size: 1.15rem; margin-bottom: 2px; }
+.mobile-tabbar .tab-item.active { color: var(--nerap-secondary); }
+
+@media (max-width: 767px) {
+    .mobile-tabbar { display: flex; }
+    body { padding-bottom: calc(64px + var(--safe-bottom)); }
+    .hero-section { border-radius: 0 0 22px 22px; padding: 1.4rem 0 1.8rem; }
+}
+
+/* -------------------------------------------------------------------------
+   Admin panel layout (sidebar + topbar)
+   ---------------------------------------------------------------------- */
+.admin-sidebar {
+    background: var(--nerap-primary);
+    min-height: 100vh;
+    width: 240px;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    padding: 1.2rem 0.8rem;
+    z-index: 1030;
+    transition: left .2s ease;
+}
+.admin-sidebar .brand { color: #fff; font-weight: 800; padding: 0 0.6rem 1rem; display:flex; align-items:center; gap:8px;}
+.admin-sidebar .brand img { height: 28px; }
+.admin-sidebar .nav-link {
+    color: rgba(255,255,255,0.75);
+    border-radius: var(--nerap-radius-sm);
+    padding: 0.6rem 0.8rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+}
+.admin-sidebar .nav-link i { width: 20px; margin-right: 8px; }
+.admin-sidebar .nav-link.active, .admin-sidebar .nav-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.admin-content { margin-left: 240px; padding: 1.4rem 1.6rem calc(1.4rem + var(--safe-bottom)); }
+.admin-topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--nerap-border);
+    padding: 0.8rem 1.2rem;
+    position: sticky; top: 0; z-index: 1020;
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar { left: -260px; }
+    .admin-sidebar.open { left: 0; }
+    .admin-content { margin-left: 0; }
+}
+
+/* Login / auth screens */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--nerap-primary) 0%, #0a3a5c 100%);
+    padding: 1.5rem;
+}
+.auth-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+/* Utility */
+.text-secondary-nerap { color: var(--nerap-secondary) !important; }
+.text-primary-nerap { color: var(--nerap-primary) !important; }
+.bg-secondary-soft { background: var(--nerap-secondary-soft) !important; }
+.rounded-nerap { border-radius: var(--nerap-radius) !important; }
+.shadow-nerap { box-shadow: var(--nerap-shadow) !important; }
