@@ -7,6 +7,7 @@
  * both channels from one place (admin_moderation.php).
  * =========================================================================
  */
+require_once __DIR__ . '/config.php';
 $page_title = 'Report Stock — ' . SITE_NAME;
 require_once __DIR__ . '/includes_header.php';
 

@@ -6,6 +6,7 @@
  * scope. Sends a Brevo confirmation email when an email address is given.
  * =========================================================================
  */
+require_once __DIR__ . '/config.php';
 $page_title = 'Get Alerts — ' . SITE_NAME;
 require_once __DIR__ . '/includes_header.php';
 require_once __DIR__ . '/email_brevo.php';

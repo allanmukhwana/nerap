@@ -7,6 +7,8 @@
  * Dashboard" described in the README, built with Bootstrap + jQuery + Chart.js.
  * =========================================================================
  */
+
+require_once __DIR__ . '/config.php';
 $page_title = SITE_NAME . ' — Live Emergency Resource Map';
 require_once __DIR__ . '/includes_header.php';
 
