@@ -1,3 +1,9 @@
+## Video Walkthrough
+
+[![NERAP Cloud Walkthrough](https://vimeo.com/1214596511)](https://vimeo.com/1214596511)
+
+▶️ **[Watch the full walkthrough on Vimeo](https://vimeo.com/1214596511)**
+
 ## Getting Started (Setup)
 
 This repo contains a working implementation of NERAP Cloud built with **Vanilla PHP, Bootstrap 5, jQuery, Font Awesome, MySQL, Brevo (API) and a WhatsApp Cloud API-compatible provider**. Flat, single-level file structure — files are grouped by prefix (`admin_*`, `auth_*`, `whatsapp_*`, `api_*`).

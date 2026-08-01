@@ -23,6 +23,7 @@ $admin_nav = [
     ['href' => 'admin_subscribers.php', 'icon' => 'fa-users',             'label' => 'Subscribers'],
     ['href' => 'admin_broadcast.php',   'icon' => 'fa-tower-broadcast',   'label' => 'Broadcast Alert'],
     ['href' => 'admin_users.php',       'icon' => 'fa-user-shield',       'label' => 'Admin Users'],
+    ['href' => 'guide.php',             'icon' => 'fa-circle-info',       'label' => 'Testing Guide'],
 ];
 ?>
 <!DOCTYPE html>
@@ -75,6 +76,7 @@ $admin_nav = [
       <h5 class="mb-0 fw-brand"><?= e($page_title) ?></h5>
     </div>
     <div class="d-flex align-items-center gap-2">
+      <a href="guide.php" target="_blank" class="btn btn-outline-nerap btn-sm me-2"><i class="fa-solid fa-circle-info me-1"></i> Guide</a>
       <span class="small text-muted d-none d-sm-inline"><?= e($_SESSION['admin_name'] ?? '') ?> (<?= e($_SESSION['admin_role'] ?? '') ?>)</span>
       <div class="rounded-circle bg-secondary-soft text-secondary-nerap d-flex align-items-center justify-content-center" style="width:36px;height:36px;">
         <i class="fa-solid fa-user"></i>

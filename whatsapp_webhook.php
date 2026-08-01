@@ -67,44 +67,22 @@ if (in_array($messageUpper, ['MENU', 'HI', 'HELLO', 'START', 'RESET'], true)) {
     exit;
 }
 
-if ($messageUpper === 'REPORT') {
-    wa_set_session($phone, 'report_facility', []);
-    wa_send($phone, "📝 *Report a Stock Update*\n\nWhat is the facility, shelter, or distribution point name?");
-    exit;
-}
-
-if ($messageUpper === 'ALERT') {
-    $resourceId = $session['data']['last_resource_id'] ?? null;
-    if (!$resourceId) {
-        db()->commit();
-        wa_send($phone, "Please search for a resource first (e.g. type *ANTIVENOM*), then reply *ALERT* to subscribe to updates for it.");
-        exit;
-    }
-    $stmt = db()->prepare("INSERT INTO subscribers (phone, resource_id, channel) VALUES (?, ?, 'whatsapp')");
-    $stmt->bind_param('si', $phone, $resourceId);
-    $stmt->execute();
-    db()->commit();
-    wa_send($phone, "🔔 You're subscribed! We'll message you the moment stock status changes.\n\nReply *MENU* to search again.");
-    exit;
-}
-
 // ---- State machine ----------------------------------------------------------
 switch ($session['state']) {
 
-    case 'awaiting_resource_choice':
-        handle_resource_choice($phone, $messageRaw, $session);
+    case 'search_resource':
+        handle_search_resource_choice($phone, $messageRaw, $session);
         break;
 
     case 'report_facility':
-        wa_set_session($phone, 'report_resource', ['facility_name_raw' => $messageRaw]);
-        wa_send($phone, "Which resource are you reporting on? (e.g. *Antivenom*, *Blood*, *ICU Bed*)");
+        handle_report_facility_choice($phone, $messageRaw, $session);
+        break;
+
+    case 'report_facility_name':
+        send_resource_menu($phone, 'report_resource', ['facility_name_raw' => $messageRaw, 'facility_id' => null]);
         break;
 
     case 'report_resource':
-        handle_report_resource($phone, $messageRaw, $session);
-        break;
-
-    case 'report_resource_choice':
         handle_report_resource_choice($phone, $messageRaw, $session);
         break;
 
@@ -112,9 +90,13 @@ switch ($session['state']) {
         handle_report_status($phone, $messageRaw, $session, $attachment);
         break;
 
+    case 'alert_resource':
+        handle_alert_resource_choice($phone, $messageRaw, $session);
+        break;
+
     case 'idle':
     default:
-        handle_idle_search($phone, $messageRaw, $session);
+        handle_idle($phone, $messageRaw, $session);
         break;
 }
 
@@ -122,33 +104,62 @@ switch ($session['state']) {
 // Handlers
 // ---------------------------------------------------------------------------
 
-/** Main entry point: user typed a free-text keyword while idle. */
-function handle_idle_search($phone, $message, $session) {
-    $matches = wa_match_resources($message);
+/** Idle state: user sent a number from the main menu. */
+function handle_idle($phone, $message, $session) {
+    $choice = trim($message);
 
-    if (empty($matches)) {
-        db()->commit();
-        wa_send($phone, "🤔 I didn't recognize that. " . wa_main_menu());
+    if ($choice === '0') {
+        send_resource_menu($phone, 'search_resource', []);
         return;
     }
 
-    if (count($matches) === 1) {
-        run_resource_search($phone, $matches[0]);
+    if ($choice === '1') {
+        send_facility_menu($phone);
         return;
     }
 
-    // Multiple sub-types matched (e.g. "antivenom" -> Polyvalent/Scorpion/Spider) — show menu.
-    $data = ['candidates' => array_map(fn($m) => ['id' => $m['id'], 'label' => $m['category'] . ($m['subtype'] ? ' - ' . $m['subtype'] : '')], $matches)];
-    wa_set_session($phone, 'awaiting_resource_choice', $data);
+    if ($choice === '2') {
+        send_resource_menu($phone, 'alert_resource', []);
+        return;
+    }
 
-    $menu = "🔍 *" . $message . "* Search\n";
-    foreach ($data['candidates'] as $i => $c) { $menu .= ($i + 1) . ". " . $c['label'] . "\n"; }
+    db()->commit();
+    wa_send($phone, "🤔 I didn't recognize that. " . wa_main_menu());
+}
+
+/** Sends a numbered menu of all resources and sets the next state. */
+function send_resource_menu($phone, $next_state, array $session_data = []) {
+    $resources = db()->query("SELECT id, category, subtype FROM resources ORDER BY category, subtype")->fetch_all(MYSQLI_ASSOC);
+    $candidates = [];
+    $menu = "Select a resource:\n\n";
+    foreach ($resources as $i => $r) {
+        $label = $r['category'] . ($r['subtype'] ? ' - ' . $r['subtype'] : '');
+        $candidates[] = ['id' => (int)$r['id'], 'label' => $label];
+        $menu .= ($i + 1) . ". " . $label . "\n";
+    }
     $menu .= "\nReply with a number:";
+    $session_data['candidates'] = $candidates;
+    wa_set_session($phone, $next_state, $session_data);
     wa_send($phone, $menu);
 }
 
-/** User replied with a number to a resource sub-type menu. */
-function handle_resource_choice($phone, $message, $session) {
+/** Sends a numbered menu of active facilities for reporting. */
+function send_facility_menu($phone) {
+    $facilities = db()->query("SELECT id, name, region FROM facilities WHERE status = 'active' ORDER BY name LIMIT 10")->fetch_all(MYSQLI_ASSOC);
+    $candidates = [];
+    $menu = "Select a facility:\n\n";
+    foreach ($facilities as $i => $f) {
+        $candidates[] = ['id' => (int)$f['id'], 'label' => $f['name']];
+        $menu .= ($i + 1) . ". " . $f['name'] . " (" . $f['region'] . ")\n";
+    }
+    $menu .= "0. Other (type facility name)\n";
+    $menu .= "\nReply with a number:";
+    wa_set_session($phone, 'report_facility', ['candidates' => $candidates]);
+    wa_send($phone, $menu);
+}
+
+/** User picked a resource from the search menu. */
+function handle_search_resource_choice($phone, $message, $session) {
     $choice = (int)$message;
     $candidates = $session['data']['candidates'] ?? [];
     if ($choice < 1 || $choice > count($candidates)) {
@@ -169,35 +180,37 @@ function run_resource_search($phone, array $resource) {
     wa_send($phone, wa_format_results_message($label, $facilities));
 }
 
-/** Step 2 of reporting: resolve the resource keyword typed by the reporter. */
-function handle_report_resource($phone, $message, $session) {
-    $matches = wa_match_resources($message);
-    if (empty($matches)) {
+/** User picked a facility from the report menu (or chose 0 for custom name). */
+function handle_report_facility_choice($phone, $message, $session) {
+    $choice = trim($message);
+    $candidates = $session['data']['candidates'] ?? [];
+
+    if ($choice === '0') {
+        wa_set_session($phone, 'report_facility_name', []);
+        wa_send($phone, "📝 Type the facility, shelter, or distribution point name:");
+        return;
+    }
+
+    $num = (int)$choice;
+    if ($num < 1 || $num > count($candidates)) {
         db()->commit();
-        wa_send($phone, "I couldn't match that to a known resource. Try again (e.g. *Blood*, *Antivenom*, *ICU Bed*), or type *RESET* to cancel.");
+        wa_send($phone, "Please reply with a valid number from the list, or 0 to type a name. Type *MENU* to start over.");
         return;
     }
-    if (count($matches) === 1) {
-        $data = $session['data'];
-        $data['resource_id'] = (int)$matches[0]['id'];
-        wa_set_session($phone, 'report_status', $data);
-        wa_send($phone, "What is the current stock status?\n1. 🟢 Confirmed / In Stock\n2. 🟡 Low Stock\n3. 🔴 Out of Stock\n\nReply with a number:");
-        return;
-    }
-    $data = $session['data'];
-    $data['candidates'] = array_map(fn($m) => ['id' => $m['id'], 'label' => $m['category'] . ($m['subtype'] ? ' - ' . $m['subtype'] : '')], $matches);
-    wa_set_session($phone, 'report_resource_choice', $data);
-    $menu = "Which specific type?\n";
-    foreach ($data['candidates'] as $i => $c) { $menu .= ($i + 1) . ". " . $c['label'] . "\n"; }
-    wa_send($phone, $menu . "\nReply with a number:");
+
+    $facilityId = (int)$candidates[$num - 1]['id'];
+    $facilityName = $candidates[$num - 1]['label'];
+    $data = ['facility_id' => $facilityId, 'facility_name_raw' => $facilityName];
+    send_resource_menu($phone, 'report_resource', $data);
 }
 
+/** User picked a resource from the report menu. */
 function handle_report_resource_choice($phone, $message, $session) {
     $choice = (int)$message;
     $candidates = $session['data']['candidates'] ?? [];
     if ($choice < 1 || $choice > count($candidates)) {
         db()->commit();
-        wa_send($phone, "Please reply with a valid number, or type *RESET* to cancel.");
+        wa_send($phone, "Please reply with a valid number from the list, or type *MENU* to start over.");
         return;
     }
     $data = $session['data'];
@@ -219,15 +232,17 @@ function handle_report_status($phone, $message, $session, $attachment) {
 
     $data = $session['data'];
     $facilityNameRaw = $data['facility_name_raw'] ?? '';
+    $facilityId = $data['facility_id'] ?? null;
     $resourceId = (int)($data['resource_id'] ?? 0);
 
-    // Try to match an existing facility by exact/partial name for a smoother moderation experience.
-    $facilityId = null;
-    $match = db()->prepare("SELECT id FROM facilities WHERE name LIKE ? LIMIT 1");
-    $like = '%' . $facilityNameRaw . '%';
-    $match->bind_param('s', $like);
-    $match->execute();
-    if ($row = $match->get_result()->fetch_assoc()) $facilityId = (int)$row['id'];
+    // If no facility_id yet, try to match an existing facility by name.
+    if (!$facilityId && $facilityNameRaw !== '') {
+        $match = db()->prepare("SELECT id FROM facilities WHERE name LIKE ? LIMIT 1");
+        $like = '%' . $facilityNameRaw . '%';
+        $match->bind_param('s', $like);
+        $match->execute();
+        if ($row = $match->get_result()->fetch_assoc()) $facilityId = (int)$row['id'];
+    }
 
     $stmt = db()->prepare("INSERT INTO submissions (source, phone, facility_id, facility_name_raw, resource_id, reported_status, attachment_url, review_status)
         VALUES ('whatsapp', ?, ?, ?, ?, ?, ?, 'pending')");
@@ -235,14 +250,31 @@ function handle_report_status($phone, $message, $session, $attachment) {
     $stmt->execute();
 
     wa_set_session($phone, 'idle', []);
-    wa_send($phone, "✅ Thank you! Your report has been submitted for moderator review and will appear on the map once verified.\n\nReply *MENU* to search for a resource.");
+    wa_send($phone, "✅ Thank you! Your report has been submitted for moderator review and will appear on the map once verified.\n\nReply *MENU* to start again.");
+}
+
+/** User picked a resource to subscribe to alerts for. */
+function handle_alert_resource_choice($phone, $message, $session) {
+    $choice = (int)$message;
+    $candidates = $session['data']['candidates'] ?? [];
+    if ($choice < 1 || $choice > count($candidates)) {
+        db()->commit();
+        wa_send($phone, "Please reply with a valid number from the list, or type *MENU* to start over.");
+        return;
+    }
+    $resourceId = (int)$candidates[$choice - 1]['id'];
+    $stmt = db()->prepare("INSERT INTO subscribers (phone, resource_id, channel) VALUES (?, ?, 'whatsapp')");
+    $stmt->bind_param('si', $phone, $resourceId);
+    $stmt->execute();
+    wa_set_session($phone, 'idle', []);
+    wa_send($phone, "🔔 You're subscribed! We'll message you the moment stock status changes.\n\nReply *MENU* to start again.");
 }
 
 /** The always-available help/main menu text shown on MENU/HI/unrecognized input. */
 function wa_main_menu() {
-    return "👋 Welcome to *" . SITE_NAME . "*!\n\n" .
-        "🔎 Type a resource name to search (e.g. *Antivenom*, *Blood*, *ICU Bed*, *Shelter*)\n" .
-        "📝 Type *REPORT* to submit a stock update\n" .
-        "🔔 Type *ALERT* (after a search) to get notified of changes\n" .
-        "🔁 Type *MENU* anytime to see this again";
+    return "👋 Welcome to *" . SITE_NAME . "!*\n\n" .
+        "0️⃣ Search Resources\n" .
+        "1️⃣ Report Stock Update\n" .
+        "2️⃣ Subscribe to Alerts\n\n" .
+        "Reply with a number:";
 }

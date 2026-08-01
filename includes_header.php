@@ -61,6 +61,7 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
         <li class="nav-item"><a class="nav-link <?= $current_page==='report.php'?'active':'' ?>" href="report.php"><i class="fa-solid fa-file-circle-plus me-1"></i> Report Stock</a></li>
         <li class="nav-item"><a class="nav-link <?= $current_page==='subscribe.php'?'active':'' ?>" href="subscribe.php"><i class="fa-solid fa-bell me-1"></i> Get Alerts</a></li>
         <li class="nav-item"><a class="nav-link" target="_blank" href="https://wa.me/<?= e(ltrim(WA_NUMBER,'+')) ?>"><i class="fa-brands fa-whatsapp me-1"></i> Chat on WhatsApp</a></li>
+        <li class="nav-item"><a class="nav-link" href="guide.php" target="_blank"><i class="fa-solid fa-circle-info me-1"></i> Testing Guide</a></li>
         <li class="nav-item"><a class="btn btn-nerap-secondary btn-sm ms-lg-2 mt-2 mt-lg-0" href="auth_login.php"><i class="fa-solid fa-user-shield me-1"></i> Moderator Login</a></li>
       </ul>
     </div>

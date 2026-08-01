@@ -227,5 +227,6 @@ h1, h2, h3, h4, h5, .fw-brand { font-weight: 800; letter-spacing: -0.02em; }
 .text-secondary-nerap { color: var(--nerap-secondary) !important; }
 .text-primary-nerap { color: var(--nerap-primary) !important; }
 .bg-secondary-soft { background: var(--nerap-secondary-soft) !important; }
+.bg-primary-nerap { background: var(--nerap-primary) !important; }
 .rounded-nerap { border-radius: var(--nerap-radius) !important; }
 .shadow-nerap { box-shadow: var(--nerap-shadow) !important; }
